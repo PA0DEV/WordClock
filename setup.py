@@ -14,6 +14,7 @@ r = requests.get("https://raw.githubusercontent.com/PA0DEV/WordClock/main/versio
 if r.status_code == 200:
     newestInfo = json.loads(r.text)
     newestVersion = newestInfo["version"]
+    print(newestVersion)
 else:
     ###---Error Code ---###
     ...
