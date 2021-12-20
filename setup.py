@@ -1,12 +1,31 @@
 import json
-v = "0.0.0"
+from os import write
+import requests
 
+## load own version info from json ##
 with open('version.json') as f:
     info = json.load(f)
-print(info["version"])
+ownVersion = info["version"]
 
-if v < info["version"]:
-    print("update")
+## load newest version from github ##
+r = requests.get("https://raw.githubusercontent.com/PA0DEV/WordClock/main/version.json")
 
-if v > info["version"]:
-    print("no update")
+    # Status code 200 = OK
+if r.status_code == 200:
+    newestInfo = json.loads(r.text)
+    newestVersion = newestInfo["version"]
+else:
+    ###---Error Code ---###
+    ...
+
+if newestVersion > ownVersion:
+    ###---Update Code---###
+    with open('NEWmain.py', 'w') as f:
+        write(requests.get("https://raw.githubusercontent.com/PA0DEV/WordClock/main/main.py").text)
+    ...
+    
+    
+elif newestVersion == ownVersion:
+    ###---Normal Code---###
+    ...
+    
