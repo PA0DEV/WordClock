@@ -20,8 +20,11 @@ else:
 
 if newestVersion > ownVersion:
     ###---Update Code---###
-    with open('NEWmain.py', 'w') as f:
-        write(requests.get("https://raw.githubusercontent.com/PA0DEV/WordClock/main/main.py").text)
+    f = open("NEWmain.py", "a")
+    r = requests.get("https://raw.githubusercontent.com/PA0DEV/WordClock/main/main.py").text
+    print(r)
+    f.write(r)
+    f.close()
     ...
     
     
