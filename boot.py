@@ -1,14 +1,14 @@
 #
 # name: Phillip Ahlers 
 # created:  24.12.2021
-# class: ETS2021
 #
 #
 # use:
 #  - connect to wifi AP and test the connection
 #  - check newest firmware online
+#  - download and update code from https://github.com/PA0DEV/WordClock
 # 
-# version: 0.0.1
+# version: 0.0.0
 # designed and tested on Wemos D1 mini (ESP8266)
 #
 # pin conenctions:
@@ -19,8 +19,8 @@
 # ----------------------------------------
 ### imports ###
 
-from typing import DefaultDict
 import network
+import machine
 import json
 import time
 import requests
@@ -50,6 +50,7 @@ wifi.active(True)
     ## dynamic ip or static ip ##
 if wifiDHCP:
     if not wifi.isconnected():
+        print("[WIFI] Trying to connect to ap: %s ; %s" %(wifiSSID, wifiPass))
         wifi.connect(wifiSSID, wifiPass)
 else:
     wifi.ifconfig((wifiClientIP, wifiSubnet, wifiGateway, '8.8.8.8'))
@@ -67,6 +68,7 @@ if wifi.isconnected():
     ## device is online ##
     info["device"]["online"] = True
     info["device"]["clientIP"] = wifi.ifconfig()[0]
+    print("[WIFI] Connected! IP: %s"%(wifi.ifconfig()[0]))
     ...
 
 else:
@@ -82,17 +84,18 @@ autoUpdate = settings["updates"]["autoUpdate"]
 updateOnBoot = settings["updates"]["updateOnBoot"]
     ## check own version ##
 
-
     ## get newest version online ##
 if autoUpdate or updateOnBoot:
     ownVersion = info["general"]["version"]
+    print("[Update] Own version: %s"%(ownVersion))
     fwUrl = settings["updates"]["updateURL"]
     remoteVersion = requests.get(fwUrl + "info.json").text
     remoteVersion = json.loads(remoteVersion)
     remoteVersion = remoteVersion["general"]["version"]
-
+    print("[Update] Remote version: %s"%(remoteVersion))
     if remoteVersion > ownVersion:
         ### Update code###
+        print("[Update] Starting update...")
         ...
         res = requests.get(fwUrl + "files.json").text
         files = json.loads(res)
@@ -106,8 +109,12 @@ if autoUpdate or updateOnBoot:
             with open(files[file], "w") as f:
                 payload = requests.get(fwUrl + files[file]).text
                 f.write(payload)
+        print("[Update] Update successfull!")
+        print("[Update] Rebooting...")
+        machine.reset()
     else:
         ### no update ###
+        print("[Update] no update found...")
         pass
 
 
