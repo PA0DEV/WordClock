@@ -18,6 +18,9 @@
 # 
 # ----------------------------------------
 ### imports ###
+print()
+print()
+print()
 
 import network
 import machine

@@ -55,11 +55,12 @@ while True:
     wday = wDays[time[6]]
 
     print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
-    sensor.mesure()
+    sensor.measure()
     temp = sensor.temperature()
     humid = sensor.humidity()
 
     print("Temperature: %2.1f"%temp)
     print("Humidity: %2.1f"%humid)
+    print()
     
     sleep(1)
