@@ -9,7 +9,7 @@
     },
     "updates": {
         "autoUpdate": true,
-        "updateOnBoot": false,
+        "updateOnBoot": true,
         "updateURL": "https://raw.githubusercontent.com/PA0DEV/WordClock/main/"
     }
 }
