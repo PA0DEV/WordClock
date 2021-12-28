@@ -22,7 +22,7 @@ if remoteVersion > ownVersion:
     for file in files:
         print(files[file])
 
-        with open("test_" + files[file], "w") as f:
+        with open(files[file] + "_test", "w") as f:
             payload = requests.get(fwUrl + files[file]).text
             f.write(payload)
 
