@@ -1,8 +1,1 @@
-{
-    "main": "main.py",
-    "boot": "boot.py",
-    "setup": "setup.json",
-    "info": "info.json",
-    "test": "test.py",
-    "ds3231": "./libraries/ds3231.py"
-}
+{"main": "main.py", "boot": "boot.py", "setup": "setup.json", "info": "info.json", "test": "test.py", "ds3231": "./libraries/ds3231.py"}
