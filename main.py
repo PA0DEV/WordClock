@@ -28,9 +28,7 @@ from time import sleep, localtime
 
 # ----------------------------------------
 timezone = 1
-ntptime.settime()
-print(localtime())
-
+wDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
 rtc = ds3231.DS3231(i2c)
@@ -39,7 +37,7 @@ rtc = ds3231.DS3231(i2c)
 
 
 while True:
-    time = rtc.get_time()
+    time = rtc.get_time()       # (year, month, day, hour, minute, second, wday, 0)
     year = time[0]
     month = time[1]
     day = time[2]
@@ -48,6 +46,6 @@ while True:
     second = time[5]
     wday = time[6]
 
-    print("Current time: %i.%i.%i ; %i:%i:%i -- %i"%(day, month, year, hour, minute, second, wday))
+    print("Current time: %s, %i.%i.%i ; %i:%i:%i -- %i"%(wDays[wday], day, month, year, hour, minute, second,))
     
     sleep(1)
