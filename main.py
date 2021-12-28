@@ -27,7 +27,7 @@ import ntptime
 from time import sleep, localtime, timezone
 
 # ----------------------------------------
-ntptime.settime(timezone = 1, server = "de.pool.ntp.org")
+ntptime.settime(1, "de.pool.ntp.org")
 print(localtime())
 
 
