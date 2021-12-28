@@ -28,7 +28,8 @@ from machine import Pin, SoftI2C
 import ds3231
 import ntptime
 import dht
-from time import sleep, localtime
+from time import sleep
+import uasyncio
 
 # ----------------------------------------
 ### setup rtc module ###
@@ -42,25 +43,39 @@ rtc = ds3231.DS3231(i2c)
 ### setup DHT11 module ###
 sensor = dht.DHT11(Pin(0))
 
+# ----------------------------------------
+### setup async time and temperature update ###
+async def getTimeAndTemp():
+    while True:
+        global time
+        global temp
 
+        time = rtc.get_time()       # (year, month, day, hour, minute, second, wday, 0)
+        year = time[0]
+        month = time[1]
+        day = time[2]
+        hour = time[3] + timezone
+        minute = time[4]
+        second = time[5]
+        wday = wDays[time[6]]
 
-while True:
-    time = rtc.get_time()       # (year, month, day, hour, minute, second, wday, 0)
-    year = time[0]
-    month = time[1]
-    day = time[2]
-    hour = time[3] + timezone
-    minute = time[4]
-    second = time[5]
-    wday = wDays[time[6]]
+        print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
+        sensor.measure()
+        temp = sensor.temperature()
+        humid = sensor.humidity()
 
-    print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
-    sensor.measure()
-    temp = sensor.temperature()
-    humid = sensor.humidity()
+        print("Temperature: %2.1f"%temp)
+        print("Humidity: %2.1f"%humid)
+        print()
+        
+        await uasyncio.sleep_ms(1000)
 
-    print("Temperature: %2.1f"%temp)
-    print("Humidity: %2.1f"%humid)
-    print()
-    
-    sleep(1)
+# ----------------------------------------
+### start the methods ###
+async def run():
+    while True:
+        task1 = uasyncio.create_task(getTimeAndTemp())
+        
+
+        await task1
+uasyncio.run(run())
