@@ -27,6 +27,7 @@ import ntptime
 from time import sleep, localtime
 
 # ----------------------------------------
+timezone = 1
 ntptime.settime()
 print(localtime())
 
@@ -34,7 +35,7 @@ print(localtime())
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
 rtc = ds3231.DS3231(i2c)
 rtc.save_time()
-timezone = 1
+
 
 
 while True:
