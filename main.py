@@ -24,11 +24,11 @@
 #  - ds3231.py
 # ----------------------------------------
 ### imports ###
-from machine import Pin, SoftI2C
+from machine import Pin, SoftI2C, RTC
 import ds3231
 import ntptime
 import dht
-from time import sleep
+from time import localtime
 import uasyncio
 
 # ----------------------------------------
@@ -38,7 +38,8 @@ wDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Su
 
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
 rtc = ds3231.DS3231(i2c)
-
+espTime = RTC()
+espTime = rtc.get_time()
 # ----------------------------------------
 ### setup DHT11 module ###
 sensor = dht.DHT11(Pin(0))
@@ -51,6 +52,7 @@ async def getTimeAndTemp():
         global temp
 
         time = rtc.get_time()       # (year, month, day, hour, minute, second, wday, 0)
+        
         year = time[0]
         month = time[1]
         day = time[2]
@@ -60,6 +62,12 @@ async def getTimeAndTemp():
         wday = wDays[time[6]]
 
         print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
+
+        if localtime().tm_isdst:
+            print("Summertime")
+        else:
+            print("Wintertime")
+
         sensor.measure()
         temp = sensor.temperature()
         humid = sensor.humidity()
