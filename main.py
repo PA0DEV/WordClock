@@ -24,7 +24,6 @@
 #  - ds3231.py
 # ----------------------------------------
 ### imports ###
-import network
 from machine import Pin, SoftI2C
 import ds3231
 import ntptime

@@ -55,6 +55,7 @@ if wifiDHCP:
 else:
     wifi.ifconfig((wifiClientIP, wifiSubnet, wifiGateway, '8.8.8.8'))
     if not wifi.isconnected():
+        print("[WIFI] Trying to connect to ap: %s ; %s" %(wifiSSID, wifiPass))
         wifi.connect(wifiSSID, wifiPass)
 
 ## start try to connect to ap ##
@@ -69,12 +70,14 @@ if wifi.isconnected():
     info["device"]["online"] = True
     info["device"]["clientIP"] = wifi.ifconfig()[0]
     print("[WIFI] Connected! IP: %s"%(wifi.ifconfig()[0]))
-    ...
+    print()
+    
 
 else:
     ## error code here ##
     info["device"]["online"] = False
-    ...
+    print("[WIFI] Cannot connect to WiFi!")
+    
 with open("info.json", "w") as f:
     json.dump(info, f)
 
@@ -85,7 +88,7 @@ updateOnBoot = settings["updates"]["updateOnBoot"]
     ## check own version ##
 
     ## get newest version online ##
-if autoUpdate or updateOnBoot:
+if (autoUpdate or updateOnBoot) and info["device"]["online"]:
     ownVersion = info["general"]["version"]
     print("[Update] Own version: %s"%(ownVersion))
     fwUrl = settings["updates"]["updateURL"]
@@ -111,6 +114,7 @@ if autoUpdate or updateOnBoot:
                 f.write(payload)
         print("[Update] Update successfull!")
         print("[Update] Rebooting...")
+        time.sleep(1)
         machine.reset()
     else:
         ### no update ###
