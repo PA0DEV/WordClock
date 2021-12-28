@@ -24,7 +24,7 @@ import network
 from machine import Pin, SoftI2C
 import ds3231
 import ntptime
-from time import sleep, localtime, timezone
+from time import sleep, localtime
 
 # ----------------------------------------
 ntptime.settime()
