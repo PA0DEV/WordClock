@@ -20,16 +20,22 @@
 #  - ds3231.py
 # ----------------------------------------
 ### imports ###
-
 import network
 from machine import Pin, SoftI2C
 import ds3231
-from time import sleep
+import ntptime
+from time import sleep, localtime
 
 # ----------------------------------------
+ntptime.settime()
+print(localtime())
+
 
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
 rtc = ds3231.DS3231(i2c)
+rtc.save_time()
+
+
 
 while True:
     time = rtc.get_time()
