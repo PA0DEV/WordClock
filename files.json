@@ -1,0 +1,6 @@
+{
+    "main": "main.py",
+    "boot": "boot.py",
+    "setup": "setup.json",
+    "info":
+}
