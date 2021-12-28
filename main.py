@@ -23,7 +23,7 @@
 
 import network
 from machine import Pin, SoftI2C
-from libraries import ds3231
+import ds3231
 from time import sleep
 
 # ----------------------------------------
