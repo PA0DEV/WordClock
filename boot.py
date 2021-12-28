@@ -6,6 +6,7 @@
 #
 # use:
 #  - connect to wifi AP and test the connection
+#  - check newest firmware online
 # 
 # version: 0.0.1
 # designed and tested on Wemos D1 mini (ESP8266)
@@ -18,10 +19,11 @@
 # ----------------------------------------
 ### imports ###
 
+from typing import DefaultDict
 import network
 import json
 import time
-
+import requests
 
 # ----------------------------------------
 ## collect  WIFI setup data ##
@@ -73,3 +75,38 @@ else:
     ...
 with open("info.json", "w") as f:
     json.dump(info, f)
+
+# ----------------------------------------
+## Version check ##
+autoUpdate = settings["updates"]["autoUpdate"]
+updateOnBoot = settings["updates"]["updateOnBoot"]
+    ## check own version ##
+
+
+    ## get newest version online ##
+if autoUpdate or updateOnBoot:
+    ownVersion = info["general"]["version"]
+    fwUrl = settings["updates"]["updateURL"]
+    remoteVersion = requests.get(fwUrl + "info.json").text
+    remoteVersion = json.loads(remoteVersion)
+    remoteVersion = remoteVersion["general"]["version"]
+
+    if remoteVersion > ownVersion:
+        ### Update code###
+        ...
+        res = requests.get(fwUrl + "files.json").text
+        files = json.loads(res)
+
+        with open("files.json", "w") as f:
+            json.dump(files, f)
+
+        for file in files:
+            with open(file, "w") as f:
+                
+
+    else:
+        ### no update ###
+        pass
+
+
+    

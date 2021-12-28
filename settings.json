@@ -1,5 +1,5 @@
 {
-    "wifi": {   
+    "wifi": {
         "ssid": "PATH to Internet",
         "pass": "WLANphtasBUDE",
         "dhcp": false,
@@ -7,7 +7,9 @@
         "subnet": "255.255.255.0",
         "gateway": "192.168.178.1"
     },
-    "others": {
-        
+    "updates": {
+        "autoUpdate": true,
+        "updateOnBoot": false,
+        "updateURL": "https://raw.githubusercontent.com/PA0DEV/WordClock/main/"
     }
 }
