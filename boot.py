@@ -101,9 +101,11 @@ if autoUpdate or updateOnBoot:
             json.dump(files, f)
 
         for file in files:
-            with open(file, "w") as f:
-                
+            print(files[file])
 
+            with open(files[file], "w") as f:
+                payload = requests.get(fwUrl + files[file]).text
+                f.write(payload)
     else:
         ### no update ###
         pass
