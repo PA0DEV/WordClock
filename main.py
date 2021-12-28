@@ -24,10 +24,10 @@ import network
 from machine import Pin, SoftI2C
 import ds3231
 import ntptime
-from time import sleep, localtime
+from time import sleep, localtime, timezone
 
 # ----------------------------------------
-ntptime.settime()
+ntptime.settime(timezone = 1, server = "de.pool.ntp.org")
 print(localtime())
 
 
