@@ -44,8 +44,8 @@ while True:
     hour = time[3] + timezone
     minute = time[4]
     second = time[5]
-    wday = time[6]
+    wday = wDays[time[6]]
 
-    print("Current time: %s, %i.%i.%i ; %i:%i:%i -- %i"%(wDays[wday], day, month, year, hour, minute, second,))
+    print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
     
     sleep(1)
