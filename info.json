@@ -1,0 +1,11 @@
+{
+    "general": {
+        "version": "0.0.0",
+        "author": "Phillip Ahlers",
+        "model": "testBoard"
+    },
+    "device": {
+        "online": false,
+        "clientIP": ""
+    }
+}
