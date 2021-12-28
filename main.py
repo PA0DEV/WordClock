@@ -27,14 +27,14 @@ import ntptime
 from time import sleep, localtime, timezone
 
 # ----------------------------------------
-ntptime.settime(1, "de.pool.ntp.org")
+ntptime.settime()
 print(localtime())
 
 
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
 rtc = ds3231.DS3231(i2c)
 rtc.save_time()
-
+timezone = 1
 
 
 while True:
@@ -42,7 +42,7 @@ while True:
     year = time[0]
     month = time[1]
     day = time[2]
-    hour = time[3]
+    hour = time[3] + timezone
     minute = time[4]
     second = time[5]
     wday = time[6]
