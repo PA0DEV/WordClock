@@ -23,7 +23,7 @@ import network
 import machine
 import json
 import time
-import requests
+import urequests
 
 # ----------------------------------------
 ## collect  WIFI setup data ##
@@ -89,7 +89,7 @@ if autoUpdate or updateOnBoot:
     ownVersion = info["general"]["version"]
     print("[Update] Own version: %s"%(ownVersion))
     fwUrl = settings["updates"]["updateURL"]
-    remoteVersion = requests.get(fwUrl + "info.json").text
+    remoteVersion = urequests.get(fwUrl + "info.json").text
     remoteVersion = json.loads(remoteVersion)
     remoteVersion = remoteVersion["general"]["version"]
     print("[Update] Remote version: %s"%(remoteVersion))
@@ -97,7 +97,7 @@ if autoUpdate or updateOnBoot:
         ### Update code###
         print("[Update] Starting update...")
         ...
-        res = requests.get(fwUrl + "files.json").text
+        res = urequests.get(fwUrl + "files.json").text
         files = json.loads(res)
 
         with open("files.json", "w") as f:
@@ -107,7 +107,7 @@ if autoUpdate or updateOnBoot:
             print(files[file])
 
             with open(files[file], "w") as f:
-                payload = requests.get(fwUrl + files[file]).text
+                payload = urequests.get(fwUrl + files[file]).text
                 f.write(payload)
         print("[Update] Update successfull!")
         print("[Update] Rebooting...")
