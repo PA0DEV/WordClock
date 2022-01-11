@@ -51,7 +51,7 @@ async def getTimeAndTemp():
         global time
         global temp
 
-        time = rtc.get_time()       # (year, month, day, hour, minute, second, wday, 0)
+        time = rtc.get_time()       # returns [year, month, day, hour, minute, second, wday, 0]
         
         year = time[0]
         month = time[1]
@@ -63,10 +63,7 @@ async def getTimeAndTemp():
 
         print("Current time: %s, %i.%i.%i ; %i:%i:%i"%(wday, day, month, year, hour, minute, second,))
 
-        if localtime().tm_isdst:
-            print("Summertime")
-        else:
-            print("Wintertime")
+        
 
         sensor.measure()
         temp = sensor.temperature()
