@@ -13,6 +13,8 @@
         "updateURL": "https://raw.githubusercontent.com/PA0DEV/WordClock/main/"
     },
     "clock": {
-        "timezone": 1
+        "timezone": 1,
+        "timeserver": "ntp.ntsc.ac.cn",
+        "autoTimeset": true
     }
 }
