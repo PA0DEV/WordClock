@@ -28,12 +28,11 @@ from machine import Pin, SoftI2C, RTC
 import ds3231
 import ntptime
 import dht
-from time import localtime
 import uasyncio
+import json
 
 # ----------------------------------------
 ### setup rtc module ###
-timezone = 1
 wDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4), freq=100000)
@@ -45,17 +44,25 @@ espTime = rtc.get_time()
 sensor = dht.DHT11(Pin(0))
 
 # ----------------------------------------
+### collect settings data ###
+with open("settings.json") as f:
+    settings = json.load(f)
+# ----------------------------------------
 ### setup async time and temperature update ###
 async def getTimeAndTemp():
     while True:
         global time
         global temp
 
-        time = rtc.get_time()       # returns [year, month, day, hour, minute, second, wday, 0]
+        timezone = settings["clock"]["timezone"]
+        
+
+        time = rtc.get_time()       # returns [year, month, day, hour, minute, second, wday, 0] (UTC time)
         
         year = time[0]
         month = time[1]
         day = time[2]
+        if 
         hour = time[3] + timezone
         minute = time[4]
         second = time[5]

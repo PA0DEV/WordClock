@@ -11,5 +11,8 @@
         "autoUpdate": true,
         "updateOnBoot": true,
         "updateURL": "https://raw.githubusercontent.com/PA0DEV/WordClock/main/"
+    },
+    "clock": {
+        "timezone": 1
     }
 }
