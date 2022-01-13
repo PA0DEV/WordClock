@@ -3,6 +3,5 @@
     "boot": "boot.py",
     "setup": "setup.json",
     "info": "info.json",
-    "test": "test.py",
     "ds3231": "ds3231.py"
 }

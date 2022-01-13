@@ -107,6 +107,7 @@ async def getTimeAndTemp():
 ###  ###
 async def display():
     wDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    dispItIs = [0, 1, 2, 3, 4]
     dispHours = [
         [83, 84, 85, 86, 87],       # 00 | 12
         [49, 50, 51, 52],           # 01
@@ -135,6 +136,23 @@ async def display():
         [19, 20, 21, 22, 30, 31, 32],                                                   # 50
         [5, 6, 7, 8, 30, 31, 32],                                                       # 55
     ]
+
+    while True:
+        ### Words LED controll ### 
+        for adr in dispItIs:
+            print(adr)
+            ## LED CODE ##
+            ...
+        for adr in dispHours[locTime[3]]:
+            print(adr)
+            ## LED CODE ##
+            ...
+        for adr in dispMins[locTime[4]]:
+            print(adr)
+            ## LED Code ##
+            ...
+
+
 
 # ----------------------------------------
 ### start the methods ###
