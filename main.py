@@ -19,6 +19,8 @@
 #   5 -> I2C clock
 #   4 -> I2C data
 #   0 -> DHT data
+#   14 -> Data LED Words
+#   12 -> Data LED Segments
 # 
 # used external libaries:
 #  - ds3231.py
