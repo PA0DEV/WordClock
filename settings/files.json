@@ -1,0 +1,20 @@
+{
+    "libs": [
+        "autoUpdater.py",
+        "segments.py",
+        "wordclock.py"
+    ],
+    "main": [
+        "boot.py",
+        "ds3231.py",
+        "files.json",
+        "main.py",
+        "README.md",
+        "settings.json",
+        "test.py"
+    ],
+    "settings": [
+        "files.json",
+        "info.json"
+    ]
+}

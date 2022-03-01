@@ -1,5 +1,5 @@
-from libs import segments
+from libs import autoUpdater
 
-segment = segments.Segments(12, numDisplay=1, )
+updater = autoUpdater.Updater("https://github.com/PA0DEV/WordClock")
 
-segment.demo(3, color=(50, 0, 0))
+updater.checkVersion()
