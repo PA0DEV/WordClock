@@ -1,5 +1,4 @@
 import json
-from turtle import width
 try:
     import requests
 except:
@@ -14,15 +13,17 @@ class Updater:
             :param repoUrl: URL of the repository
             :return: returns nothing 
         """
-        self.repoUrl = repoUrl
+        index = repoUrl.find(".com")
+        cutUrl = repoUrl[index+4:]
+        self.repoUrl = "https://raw.githubusercontent.com" + cutUrl + "/main/"
         
         ...
 
-    def checkVersion(self):
+    def isNewUpdate(self):
         """
         Check and comare the current version of the Software to the version available
         
-            :return: returns true if there is a new version available
+            :return: Returns true if there is a new version available
         """
 
         # check for available internet connection
@@ -32,10 +33,58 @@ class Updater:
         # read own fw version
         with open("./settings/info.json") as f:
             ownFw = json.load(f)["device"]["version"]
-            print(ownFw)
+
+        # get available fw version
+
+        url = self.repoUrl + "settings/info.json"
+        onlineFw = requests.get(url).text
+        onlineFw = json.loads(onlineFw)
+        onlineFw = onlineFw["device"]["version"]
+
+        if onlineFw > ownFw:
+            return True
+        else:
+            return False
+
+    def downloadFile(self, file):
+        url = self.repoUrl + file
+        file = requests.get(url).text
+        
+        return file
+
+    def updateFile(self, file):
+        with open(file, "w") as f:
+            f.write(self.downloadFile(file)) 
+            f.close()
+        return
+
 
     def downloadUpdate(self):
-        ...
+        """
+        Method to download newest update if available
+        
+            :return: Returns True if download is ready and need to reboot
+        """
+        if self.isNewUpdate():
+            files = json.loads(self.downloadFile("/settings/files.json"))
+            print("Updating")
+            print()
+            print("Main")
+            for file in files["main"]:
+                if file != "README.md":
+                    print("    " + file)
+            print("libs:")
+            for file in files["libs"]:
+                print("    " + file)
+            print("settings")
+            for file in files["settings"]:
+                print("    " + file)
+            
+
+            return True
+        else:
+            return False
+
 
     def isOnline(self):
         """
