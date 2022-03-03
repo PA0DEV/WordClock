@@ -13,11 +13,12 @@ class Updater:
             :param repoUrl: URL of the repository ('http://www.github.com/User/Repository')
             :return: returns nothing 
         """
+
+        # change url to raw.github.com
         index = repoUrl.find(".com")
         cutUrl = repoUrl[index+4:]
         self.repoUrl = "https://raw.githubusercontent.com" + cutUrl + "/main/"
-        
-        ...
+
 
     def isNewUpdate(self):
         """
@@ -56,7 +57,6 @@ class Updater:
     def updateFile(self, file):
         with open(file, "w") as f:
             f.write(self.downloadFile(file)) 
-            f.close()
         return
 
 
@@ -74,17 +74,17 @@ class Updater:
             for file in files["main"]:
                 if file != "README.md":         #< Ignore README.md
                     print("    " + file)
-                    # self.updateFile(file)
+                    self.updateFile(file)
                     ...
             print("libs:")
             for file in files["libs"]:
                 print("    " + file)
-                self.updateFile(file)
+                self.updateFile("libs/" + file)
                 ...
             print("settings")
             for file in files["settings"]:
                 print("    " + file)
-                self.updateFile(file)
+                self.updateFile("settings" + file)
                 ...
             
 
