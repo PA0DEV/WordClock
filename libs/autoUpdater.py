@@ -10,7 +10,7 @@ class Updater:
         """
         Update Micropython code from public github repository
 
-            :param repoUrl: URL of the repository
+            :param repoUrl: URL of the repository ('http://www.github.com/User/Repository')
             :return: returns nothing 
         """
         index = repoUrl.find(".com")
@@ -28,12 +28,12 @@ class Updater:
 
         # check for available internet connection
         if not self.isOnline():
+            print("not online")
             return False
         
         # read own fw version
         with open("./settings/info.json") as f:
             ownFw = json.load(f)["device"]["version"]
-<<<<<<< Updated upstream
 
         # get available fw version
 
@@ -59,11 +59,6 @@ class Updater:
             f.close()
         return
 
-=======
-        
-        # get fw version available
-        
->>>>>>> Stashed changes
 
     def downloadUpdate(self):
         """
@@ -77,14 +72,20 @@ class Updater:
             print()
             print("Main")
             for file in files["main"]:
-                if file != "README.md":
+                if file != "README.md":         #< Ignore README.md
                     print("    " + file)
+                    # self.updateFile(file)
+                    ...
             print("libs:")
             for file in files["libs"]:
                 print("    " + file)
+                self.updateFile(file)
+                ...
             print("settings")
             for file in files["settings"]:
                 print("    " + file)
+                self.updateFile(file)
+                ...
             
 
             return True
