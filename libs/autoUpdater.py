@@ -33,6 +33,7 @@ class Updater:
         # read own fw version
         with open("./settings/info.json") as f:
             ownFw = json.load(f)["device"]["version"]
+<<<<<<< Updated upstream
 
         # get available fw version
 
@@ -58,6 +59,11 @@ class Updater:
             f.close()
         return
 
+=======
+        
+        # get fw version available
+        
+>>>>>>> Stashed changes
 
     def downloadUpdate(self):
         """
