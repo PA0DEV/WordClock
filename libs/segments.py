@@ -38,7 +38,7 @@ segmentNumbers = {
     "7": [0, 4, 5],
     "8": [0, 1, 2, 3, 4, 5, 6],
     "9": [0, 1, 3, 4, 5, 6],
-    "Â°": [3, 4, 5, 6],
+    "°": [3, 4, 5, 6],
     "C": [1, 2, 3, 4],
     "F": [2, 3, 4, 6],
     "E": [1, 2, 3, 4, 6],
@@ -166,7 +166,7 @@ class Segments:
             sleep(delay)
             self.setSegment(0, "9", color=color)
             sleep(delay)
-            self.setSegment(0, "Â°", color=color)
+            self.setSegment(0, "°", color=color)
             sleep(delay)
             self.setSegment(0, "C", color=color)
             sleep(delay)
