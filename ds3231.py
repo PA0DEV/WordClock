@@ -28,7 +28,7 @@ rtc = machine.RTC()
 def get_ms(s):  # Pyboard 1.x datetime to ms. Caller handles rollover.
     return (1000 * (255 - s[7]) >> 8) + s[6] * 1000 + s[5] * 60_000 + s[4] * 3_600_000
 
-def get_us(s):  # For Pyboard D: convert datetime to μs. Caller handles rollover
+def get_us(s):  # For Pyboard D: convert datetime to us. Caller handles rollover
     return s[7] + s[6] * 1_000_000 + s[5] * 60_000_000 + s[4] * 3_600_000_000
 
 def bcd2dec(bcd):
@@ -121,7 +121,7 @@ class DS3231:
         st = rtc.datetime()[7]
         while rtc.datetime()[7] == st:  # Wait for RTC to change
             pass
-        t1 = utime.ticks_diff(utime.ticks_us(), tus)  # t1 is duration (μs) between DS and RTC change (start)
+        t1 = utime.ticks_diff(utime.ticks_us(), tus)  # t1 is duration (us) between DS and RTC change (start)
         rtcstart = get_ms(rtc.datetime())  # RTC start time in mS
         dsstart = utime.mktime(self.convert())  # DS start time in secs as recorded by await_transition
 
@@ -132,13 +132,13 @@ class DS3231:
         st = rtc.datetime()[7]
         while rtc.datetime()[7] == st:
             pass
-        t2 = utime.ticks_diff(utime.ticks_us(), tus)  # t2 is duration (μs) between DS and RTC change (end)
+        t2 = utime.ticks_diff(utime.ticks_us(), tus)  # t2 is duration (us) between DS and RTC change (end)
         rtcend = get_ms(rtc.datetime())
         dsend = utime.mktime(self.convert())
-        dsdelta = (dsend - dsstart) * 1000000  # Duration (μs) between DS edges as measured by DS3231
+        dsdelta = (dsend - dsstart) * 1000000  # Duration (us) between DS edges as measured by DS3231
         if rtcend < rtcstart:  # It's run past midnight. Assumption: run time < 1 day!
             rtcend += 24 * 3_600_000
-        rtcdelta = (rtcend - rtcstart) * 1000 + t1 - t2  # Duration (μs) between DS edges as measured by RTC and corrected
+        rtcdelta = (rtcend - rtcstart) * 1000 + t1 - t2  # Duration (us) between DS edges as measured by RTC and corrected
         ppm = (1000000* (rtcdelta - dsdelta))/dsdelta
         if cal:
             verbose and print('Error {:4.1f}ppm {:4.1f}mins/year.'.format(ppm, ppm * 1.903))
@@ -147,14 +147,14 @@ class DS3231:
         verbose and print('Error {:4.1f}ppm {:4.1f}mins/year. Cal factor {}'.format(ppm, ppm * 1.903, cal))
         return cal
 
-    # Version for Pyboard D. This has μs resolution.
+    # Version for Pyboard D. This has us resolution.
     def _getcal_d(self, minutes, cal, verbose):
         verbose and print('Pyboard D. Waiting {} minutes for calibration factor.'.format(minutes))
         rtc.calibration(cal)  # Clear existing cal
         self.save_time()  # Set DS3231 from RTC
         self.await_transition()  # Wait for DS3231 to change: on a 1 second boundary
         t = rtc.datetime()  # Get RTC time
-        # Time of DS3231 transition measured by RTC in μs since start of day
+        # Time of DS3231 transition measured by RTC in us since start of day
         rtc_start_us = get_us(t)
         dsstart = utime.mktime(self.convert())  # DS start time in secs
 
@@ -162,14 +162,14 @@ class DS3231:
 
         self.await_transition()  # Wait for DS second boundary
         t = rtc.datetime()
-        # Time of DS3231 transition measured by RTC in μs since start of day
+        # Time of DS3231 transition measured by RTC in us since start of day
         rtc_end_us = get_us(t)
         dsend = utime.mktime(self.convert()) # DS end time in secs
         if rtc_end_us < rtc_start_us:  # It's run past midnight. Assumption: run time < 1 day!
             rtc_end_us += 24 * 3_600_000_000
 
-        dsdelta = (dsend - dsstart) * 1_000_000   # Duration (μs) between DS3231 edges as measured by DS3231
-        rtcdelta = rtc_end_us - rtc_start_us  # Duration (μs) between DS edges as measured by RTC
+        dsdelta = (dsend - dsstart) * 1_000_000   # Duration (us) between DS3231 edges as measured by DS3231
+        rtcdelta = rtc_end_us - rtc_start_us  # Duration (us) between DS edges as measured by RTC
         ppm = (1_000_000 * (rtcdelta - dsdelta)) / dsdelta
         if cal:  # We've already calibrated. Just report results.
             verbose and print('Error {:4.1f}ppm {:4.1f}mins/year.'.format(ppm, ppm * 1.903))
