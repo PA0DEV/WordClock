@@ -1,69 +1,64 @@
-import datetime, time
+import time
+from libs import ds3231
+from machine import SoftI2C, Pin, RTC
 
+# (year, month, mday, hour, minute, second, weekday, yearday)
 
 class TimeSync:
-    def __init__(self, timezone=0, enDST=True) -> None:
-        pass
-
-    def summertimeStart(self, year):
-        for i in range(6):
-            date = datetime.date(year, 3, 31-i)
-            if date.weekday() == 6:
-                break
-        # print("Summertime start: " + str(date))
-        return date
-
-    def summertimeEnd(self, year):
-        for i in range(6):
-            date = datetime.date(year, 10, 31-i)
-            if date.weekday() == 6:
-                break
-        # print("Summertime end: " + str(date))
-        return date
-
-    def checkSummertime(self, tse):
+    def __init__(self, rtcSDA, rtcSCL) -> None:
         """
-        Checks the input time for daylight savings time
-
-        :param tse: the time since epoch to be checked
-        :return: returns true if time is dst - false if not
-        """
-        tm = time.gmtime(tse) 
-        stStart = self.summertimeStart(tm.tm_year)
-        stEnd = self.summertimeEnd(tm.tm_year)
-        now = datetime.datetime.fromtimestamp(tse)
-        stStartUTC = datetime.datetime.combine(stStart, datetime.time(1))
-        # print(stStartUTC)
-        # print(now)
-        stEndUTC = datetime.datetime.combine(stEnd, datetime.time(2))
-        if stEndUTC > now > stStartUTC:
-            # print("Summer")
-            return True
-        else:
-            # print("Winter")
-            return False
-
-    def adjustTime(self, utcTime, timezone, enDst=True):
-        """
-        Correct UTC-Time by timezone and summer / wintertime
+        Initiate the Time Sync
         
-            :param utcTime: UTC Time to be corrected
-            :param timezone: the current timezone (e.g. UTC+1 --> 1)
-            :param enDst: enable Daylight savngs time
-            :return: returns the current time as time struct
+            :param rtcSDA: rtc module Serial Data Pin
+            :param enDST: rtc module Serial Clock Pin
+            :return: returns nothing
         """
-        print(time.gmtime(utcTime))
-        if enDst:
-            if self.checkSummertime(utcTime):
-                actTime = utcTime + (timezone + 1) * (60 * 60)
-            else:
-                actTime = utcTime + timezone * (60 * 60)
-        else:
-            actTime = utcTime + timezone * (60 * 60)
-        print(time.gmtime(actTime))
-        return(time.gmtime(actTime))
-    
-    def getTime(self):
-        ...
+        from libs import ds3231
+        i2c = SoftI2C(scl=Pin(rtcSCL), sda=Pin(rtcSDA), freq=100000)
+        self.rtc = ds3231.DS3231(i2c)        
 
-mytime = TimeSync()
+    
+    def syncTime(self):
+        """
+        Sync the time with NTP-Server
+        
+            :return: returns nothing
+        """
+        import ntptime
+        ntptime.settime()
+
+
+    def cettime(self):
+        """
+        convert the current UTC-Time to CET / CEST
+        (year, month, mday, hour, minute, second, weekday, yearday)
+        
+            :return: returns the current Central Europe time
+        """
+
+        year = time.localtime()[0]       #get current year
+        HHMarch   = time.mktime((year,3 ,(31-(int(5*year/4+4))%7),1,0,0,0,0,0)) #Time of March change to CEST
+        HHOctober = time.mktime((year,10,(31-(int(5*year/4+1))%7),1,0,0,0,0,0)) #Time of October change to CET
+        now=time.time()
+        if now < HHMarch :               # we are before last sunday of march
+            cet=time.localtime(now+3600) # CET:  UTC+1H
+        elif now < HHOctober :           # we are before last sunday of october
+            cet=time.localtime(now+7200) # CEST: UTC+2H
+        else:                            # we are after last sunday of october
+            cet=time.localtime(now+3600) # CET:  UTC+1H
+        return(cet)
+
+    def saveTimeToRtc(self):
+        """
+        Save the current time to the RTC Module
+            :return: returns nothing"""
+
+        self.rtc.save_time()
+    
+    def getTimeFromRtc(self):
+        """
+        Get the current time from the RTC module
+            :return: returns nothing
+        """
+        tm = self.rtc.get_time(set_rtc=True)
+        RTC().datetime((tm[0], tm[1], tm[2], tm[6] + 1, tm[3], tm[4], tm[5], 0))

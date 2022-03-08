@@ -1,7 +1,9 @@
 import machine, neopixel
 import json
-from time import sleep
-
+try:
+    from uasyncio import sleep
+except:
+    from asyncio import sleep
 
 ### LED addresses ###
 # Segments
@@ -38,7 +40,7 @@ segmentNumbers = {
     "7": [0, 4, 5],
     "8": [0, 1, 2, 3, 4, 5, 6],
     "9": [0, 1, 3, 4, 5, 6],
-    "°": [3, 4, 5, 6],
+    "Â°": [3, 4, 5, 6],
     "C": [1, 2, 3, 4],
     "F": [2, 3, 4, 6],
     "E": [1, 2, 3, 4, 6],
@@ -88,14 +90,14 @@ class Segments:
                 dotAddr.append(addrOfset+(14*ledPerSegment)+led + i * ledPerSegment * 24)
         
         global np
-        np = neopixel.NeoPixel(machine.Pin(pin), ledCnt)
+        np = neopixel.NeoPixel(machine.Pin(pin), ledCnt+1)
         # Init all leds OFF (R=0, G=0, B=0)
         for i in range(ledCnt):
             np[i] = (0, 0, 0)
         np.write()
 
 
-    def setDots(display=True, dotColor=(0, 0, 100)):
+    def setDots(self, display, dotColor=(0, 0, 100)):
         """
         Method to turn the dots of the Display off / on
 
@@ -106,8 +108,10 @@ class Segments:
         for addr in dotAddr:
             if display == True:
                 np[addr] = dotColor
+                np.write()
             else:
                 np[addr] = (0, 0, 0)
+                np.write()
     
     def setSegment(self, num, value, color=(0, 0, 100)):
         """
@@ -115,7 +119,7 @@ class Segments:
 
         :param num: index of the display
         :param value: value to write
-        :param color: color of the number (R, G, B)
+        :param color: color of the number (R, G, B) Max 100
         :return: returns nothing
         """ 
         if value == None:
@@ -129,13 +133,39 @@ class Segments:
                 for i in range(7*LedPerSegment):
                     np[segStart[num]+i] = (0, 0, 0)
 
+                color = tuple([int(i / 2.55) for i in color])
+
                 for addr in numAddr[value]:
                     np[addr + segStart[num]] = color
                 np.write()
             else:
                 print("[Segment] invalid Value. Cannot display " + value)
 
-    def demo(self, delay, color=(0, 0, 100)):
+    def setDoubleSegment(self, num, value, color=(0, 0, 100)):
+        """
+        Method to write one double digit Display
+
+            :param num: index of the starting display
+            :param value: the value to write to the display (str or int (0-99))
+            :param color: color of the number (R, G, B)
+            :return: returns nothing
+        """
+
+        if isinstance(value, str):
+            try:
+                value = int(value)
+            except:
+                print("[Segment] invalid Value. Cannot display " + value)
+                return
+        elif not (isinstance(value, int) and 0<= value < 100):
+            print("[Segment] invalid Value. Cannot display " + value)
+            return
+        digit0 = value %10
+        digit1 = value // 10
+        self.setSegment(num, str(digit0), color=color)
+        self.setSegment(num+1, str(digit1), color=color)
+
+    async def demo(self, num, delay, color=(0, 0, 100)):
         """
         Method to demonstrate all Display values
 
@@ -143,42 +173,43 @@ class Segments:
         :param color: color of the numbers
         :return: returns nothing
         """ 
-        while True:
-            self.setSegment(0, None)
-            sleep(delay)
-            self.setSegment(0, "0", color=color)
-            sleep(delay)
-            self.setSegment(0, "1", color=color)
-            sleep(delay)
-            self.setSegment(0, "2", color=color)
-            sleep(delay)
-            self.setSegment(0, "3", color=color)
-            sleep(delay)
-            self.setSegment(0, "4", color=color)
-            sleep(delay)
-            self.setSegment(0, "5", color=color)
-            sleep(delay)
-            self.setSegment(0, "6", color=color)
-            sleep(delay)
-            self.setSegment(0, "7", color=color)
-            sleep(delay)
-            self.setSegment(0, "8", color=color)
-            sleep(delay)
-            self.setSegment(0, "9", color=color)
-            sleep(delay)
-            self.setSegment(0, "°", color=color)
-            sleep(delay)
-            self.setSegment(0, "C", color=color)
-            sleep(delay)
-            self.setSegment(0, "F", color=color)
-            sleep(delay)
-            self.setSegment(0, "U", color=color)
-            sleep(delay)
-            self.setSegment(0, "E", color=color)
-            sleep(delay)
-            self.setSegment(0, "P", color=color)
-            sleep(delay)
-            self.setSegment(0, "-", color=color)
-            sleep(delay)
-            print("Error Test")
-            self.setSegment(0, "aaa", color=color)
+        
+        
+        self.setSegment(num, "0", color=color)
+        await sleep(delay)
+        self.setSegment(num, "1", color=color)
+        await sleep(delay)
+        self.setSegment(num, "2", color=color)
+        await sleep(delay)
+        self.setSegment(num, "3", color=color)
+        await sleep(delay)
+        self.setSegment(num, "4", color=color)
+        await sleep(delay)
+        self.setSegment(num, "5", color=color)
+        await sleep(delay)
+        self.setSegment(num, "6", color=color)
+        await sleep(delay)
+        self.setSegment(num, "7", color=color)
+        await sleep(delay)
+        self.setSegment(num, "8", color=color)
+        await sleep(delay)
+        self.setSegment(num, "9", color=color)
+        await sleep(delay)
+        self.setSegment(num,  "Â°", color=color)
+        await sleep(delay)
+        self.setSegment(num, "C", color=color)
+        await sleep(delay)
+        self.setSegment(num, "F", color=color)
+        await sleep(delay)
+        self.setSegment(num, "U", color=color)
+        await sleep(delay)
+        self.setSegment(num, "E", color=color)
+        await sleep(delay)
+        self.setSegment(num, "P", color=color)
+        await sleep(delay)
+        self.setSegment(num, "-", color=color)
+        await sleep(delay)
+        self.setSegment(num, None)
+        await sleep(delay)
+        print("Error Test")
+        self.setSegment(0, "aaa", color=color)

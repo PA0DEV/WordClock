@@ -4,9 +4,7 @@
 #
 #
 # use:
-#  - connect to wifi AP and test the connection
-#  - check newest firmware online
-#  - download and update code from https://github.com/PA0DEV/WordClock
+#
 # 
 # version: 0.0.0
 # designed and tested on Wemos D1 mini (ESP8266)
@@ -21,108 +19,46 @@
 print()
 print()
 print()
-
 import network
-import machine
-import json
-import time
-import urequests
-
-# ----------------------------------------
-## collect  WIFI setup data ##
-with open("settings.json") as f:
-    settings = json.load(f)
-
-wifiSSID = settings["wifi"]["ssid"]
-wifiPass = settings["wifi"]["pass"]
-wifiDHCP = settings["wifi"]["dhcp"]
-wifiClientIP = settings["wifi"]["client"]
-wifiSubnet = settings["wifi"]["subnet"]
-wifiGateway = settings["wifi"]["gateway"]
-
-# ----------------------------------------
-## collect info data ##
-with open("info.json") as f:
-    info = json.load(f)
-
-# ----------------------------------------
-## Network setup ##
-wifi = network.WLAN(network.STA_IF)
-wifi.active(True)
-
-    ## dynamic ip or static ip ##
-if wifiDHCP:
-    if not wifi.isconnected():
-        print("[WIFI] Trying to connect to ap: %s ; %s" %(wifiSSID, wifiPass))
-        wifi.connect(wifiSSID, wifiPass)
-else:
-    wifi.ifconfig((wifiClientIP, wifiSubnet, wifiGateway, '8.8.8.8'))
-    if not wifi.isconnected():
-        print("[WIFI] Trying to connect to ap: %s ; %s" %(wifiSSID, wifiPass))
-        wifi.connect(wifiSSID, wifiPass)
-
-## start try to connect to ap ##
-start = time.time()
-while not wifi.isconnected() and time.time() - start < 15:
-    ## connection timeout after 15s ##
+try:
+    import gc
+    gc.collect()
+except:
     pass
 
-## check if connected ##
-if wifi.isconnected():
-    ## device is online ##
-    info["device"]["online"] = True
-    info["device"]["clientIP"] = wifi.ifconfig()[0]
-    print("[WIFI] Connected! IP: %s"%(wifi.ifconfig()[0]))
-    print()
-    
+from libs import webserver
+try:
+    import uasyncio as asyncio
+except:
+    import asyncio
 
-else:
-    ## error code here ##
-    info["device"]["online"] = False
-    print("[WIFI] Cannot connect to WiFi!")
-    
-with open("info.json", "w") as f:
-    json.dump(info, f)
+ssid = 'BZTG-IoT'
+password = 'WerderBremen24'
 
-# ----------------------------------------
-## Version check ##
-autoUpdate = settings["updates"]["autoUpdate"]
-updateOnBoot = settings["updates"]["updateOnBoot"]
-    ## check own version ##
+station = network.WLAN(network.STA_IF)
 
-    ## get newest version online ##
-if (autoUpdate or updateOnBoot) and info["device"]["online"]:
-    ownVersion = info["general"]["version"]
-    print("[Update] Own version: %s"%(ownVersion))
-    fwUrl = settings["updates"]["updateURL"]
-    remoteVersion = urequests.get(fwUrl + "info.json").text
-    remoteVersion = json.loads(remoteVersion)
-    remoteVersion = remoteVersion["general"]["version"]
-    print("[Update] Remote version: %s"%(remoteVersion))
-    if remoteVersion > ownVersion:
-        ### Update code###
-        print("[Update] Starting update...")
-        ...
-        res = urequests.get(fwUrl + "files.json").text
-        files = json.loads(res)
+station.active(True)
+station.connect(ssid, password)
 
-        with open("files.json", "w") as f:
-            json.dump(files, f)
+while station.isconnected() == False:
+  pass
 
-        for file in files:
-            print(files[file])
-
-            with open(files[file], "w") as f:
-                payload = urequests.get(fwUrl + files[file]).text
-                f.write(payload)
-        print("[Update] Update successfull!")
-        print("[Update] Rebooting...")
-        time.sleep(1)
-        machine.reset()
-    else:
-        ### no update ###
-        print("[Update] no update found...")
-        pass
+print('Connection successful')
+print(station.ifconfig())
 
 
-    
+webSrv = webserver.WebServer()
+
+
+
+async def webHandler():
+    while True:
+        webSrv.listenClient()
+        await asyncio.sleep(0.1)
+
+async def main():
+    t1 = asyncio.create_task(webHandler())
+
+    await t1
+
+asyncio.run(main())
