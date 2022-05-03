@@ -1,6 +1,5 @@
 from machine import Pin
 import neopixel
-import json
 from time import sleep
 
 class WordClock:
