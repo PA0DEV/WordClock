@@ -14,7 +14,7 @@ from libs import timeSync
 # Pin definitions # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 RTC_SDA_PIN = 0
-RTC_SCL_PIN = 0
+RTC_SCL_PIN = 5
 LED_PIN = 0 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Time # # # # # # # # # # # # # # # # # # # # # # 

@@ -1,64 +1,48 @@
-#
-# name: Phillip Ahlers 
-# created:  24.12.2021
-#
-#
-# use:
-#
-# 
-# version: 0.0.0
-# designed and tested on Wemos D1 mini (ESP8266)
-#
-# pin conenctions:
-# 
-# 
-# used external libaries:
-# 
-# ----------------------------------------
-### imports ###
-print()
-print()
-print()
-import network
-try:
-    import gc
-    gc.collect()
-except:
-    pass
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Phillip Ahlers                                          #
+# ETS2021                                                 #
+# Platinenprojekt                                         #
+# Wortuhr                                                 #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from libs import webserver
-try:
-    import uasyncio as asyncio
-except:
-    import asyncio
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Imports # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-ssid = 'BZTG-IoT'
-password = 'WerderBremen24'
+from libs import wifiManager, autoUpdater
+import machine
 
-station = network.WLAN(network.STA_IF)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Global Setup Variables  # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+REPO_URL = ""
 
-station.active(True)
-station.connect(ssid, password)
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Start WiFi Manager  # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-while station.isconnected() == False:
-  pass
+WiFi = wifiManager.getConnection()
 
-print('Connection successful')
-print(station.ifconfig())
+if WiFi is None:
+    # cannot connect to any network
+    print("[WifiMgr] Could not initialize the network connection.")
 
-
-webSrv = webserver.WebServer()
-
-
-
-async def webHandler():
     while True:
-        webSrv.listenClient()
-        await asyncio.sleep(0.1)
+        # you shall not pass
+        pass
+else:
+    print("[WifiMgr] ESP OK")
 
-async def main():
-    t1 = asyncio.create_task(webHandler())
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Automatic Firmware Updater  # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-    await t1
+updater = autoUpdater.Updater(REPO_URL)
+reqReboot = updater.downloadUpdate()
 
-asyncio.run(main())
+if reqReboot:
+    # hard reset the board
+    machine.reset()
+else:
+    # continue to main.py
+    pass

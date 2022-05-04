@@ -1,16 +1,19 @@
 {
     "libs": [
         "autoUpdater.py",
+        "ds3231.py",
+        "ntptime.py",
         "segments.py",
+        "timeSync.py",
+        "webserver.py",
+        "wifiManager.py",
         "wordclock.py"
     ],
     "main": [
         "boot.py",
-        "ds3231.py",
-        "files.json",
         "main.py",
+        "oldmain.py",
         "README.md",
-        "settings.json",
         "test.py"
     ],
     "settings": [
