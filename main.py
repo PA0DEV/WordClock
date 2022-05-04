@@ -46,16 +46,19 @@ segment = segments.Segments(LED_PIN)
 
 
 async def segmentUpdate():
+    interval = 200
+    global actTime
     if SEGMENTS_MODE == 0:
         # Clock Mode
-        global actTime
-        segment.setDoubleSegment(0, actTime[5]) # Display minutes
-        segment.setDoubleSegment(2, actTime[4]) # Display seconds
-        asyncio.sleep_ms(1000)
+        segment.setDoubleSegment(0, actTime.tm_min) # Display minutes
+        segment.setDoubleSegment(2, actTime.tm_hour) # Display seconds
+        asyncio.sleep_ms(interval)
 
     elif SEGMENTS_MODE == 1:
         # Date Mode
-        pass
+        segment.setDoubleSegment(0, actTime.tm_mon)  # Display Month
+        segment.setDoubleSegment(0, actTime.tm_mday) # Display Day
+        asyncio.sleep_ms(interval)
 
     elif SEGMENTS_MODE == 2:
         # Temperature mode
