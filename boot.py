@@ -3,6 +3,7 @@
 # ETS2021                                                 #
 # Platinenprojekt                                         #
 # Wortuhr                                                 #
+# File: setup.py
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -15,12 +16,13 @@ import machine
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Global Setup Variables  # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-REPO_URL = ""
+REPO_URL = "https://github.com/PA0DEV/WordClock"
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Start WiFi Manager  # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+# start the wifi Manager and get the active connection 
 WiFi = wifiManager.getConnection()
 
 if WiFi is None:
@@ -31,6 +33,7 @@ if WiFi is None:
         # you shall not pass
         pass
 else:
+    # wifi is connected
     print("[WifiMgr] ESP OK")
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
