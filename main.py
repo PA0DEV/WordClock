@@ -9,13 +9,34 @@ except:
 
 from libs import segments
 from libs import timeSync
+import dht
+from machine import Pin
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Pin definitions # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 RTC_SDA_PIN = 0
 RTC_SCL_PIN = 5
-LED_PIN = 0 
+LED_PIN_SEGMENT = None 
+LED_PIN_WORDS = None
+DHT_PIN = 0
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Initiate Temperature Sensor # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sensor = dht.DHT11(Pin(0))
+Temperature = 0
+Humidity = 0
+
+async def mesureTemp():
+    while True:
+        sensor.mesure()
+        global Temperature, Humidity
+        Temperature = sensor.temperature()
+        Humidity = sensor.humidity()
+
+        asyncio.sleep_ms(1000)
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Time # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -34,61 +55,77 @@ async def updateTime():
     while True:
         global actTime
         actTime = clock.cettime()   # update the local time
-        asyncio.sleep_ms(500)
+        asyncio.sleep_ms(100)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Segments # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-SEGMENTS_MODE = 0 # 0 = Clock, 1 = Date, 2 = Temperature, 3 = Cycle
+SEGMENTS_MODE = 0 # 0 = OFF, 1 = Clock, 2 = Date, 3 = Temperature, 4 = Cycle
+blinkDots = False
 
-segment = segments.Segments(LED_PIN)
 
+segment = segments.Segments(LED_PIN_SEGMENT)
 
-async def segmentUpdate():
-    interval = 200
-    global actTime
-    if SEGMENTS_MODE == 0:
-        # Clock Mode
-        segment.setDoubleSegment(0, actTime.tm_min) # Display minutes
-        segment.setDoubleSegment(2, actTime.tm_hour) # Display seconds
-        asyncio.sleep_ms(interval)
+async def setClockMode():
+    global actTime, Temperature, Humidity, blinkDots
+    while True:
+        if SEGMENTS_MODE == 0:
+            # Turn Segments OFF
+            blinkDots = False
+            segment.setDots(False)
+            segment.setSegment(0, None)
+            segment.setSegment(1, None)
+            segment.setSegment(2, None)
+            segment.setSegment(3, None)
+            
+        elif SEGMENTS_MODE == 1:
+            # Clock Mode
+            blinkDots = True
+            segment.setDoubleSegment(0, actTime.tm_min) # Set Minutes
+            segment.setDoubleSegment(2, actTime.tm_hour) # Set Hours
+            
+        elif SEGMENTS_MODE == 2:
+            # Date mode
+            blinkDots = False
+            segment.setDots(False)
+            segment.setDoubleSegment(0, actTime.tm_mon) # Set Month
+            segment.setDoubleSegment(2, actTime.tm_mday) # Set Day
+            
+        elif SEGMENTS_MODE == 3:
+            # Temperature Mode
+            blinkDots = False
+            segment.setDots(False)
+            segment.setDoubleSegment(2, int(Temperature))
+            segment.setSegment(1, "°")
+            segment.setSegment(0, "C")
+            pass
+        elif SEGMENTS_MODE == 4:
+            # Cycle Mode
+            pass
 
-    elif SEGMENTS_MODE == 1:
-        # Date Mode
-        segment.setDoubleSegment(0, actTime.tm_mon)  # Display Month
-        segment.setDoubleSegment(0, actTime.tm_mday) # Display Day
-        asyncio.sleep_ms(interval)
+        asyncio.sleep_ms(20) # Update mode every 20ms
 
-    elif SEGMENTS_MODE == 2:
-        # Temperature mode
-        pass
-    
-async def segmentDots():
-    if SEGMENTS_MODE == 0:
-        # Clock mode --> Blink with 1 Hz
-        segment.setDots(True)
-        asyncio.sleep_ms(500)
-        segment.setDots(False)
-        asyncio.sleep_ms(500)
-
-    elif SEGMENTS_MODE == 1:
-        # Date Mode --> No dots
-        segment.setDots(False)
-        asyncio.sleep_ms(500)
-        pass
-
-    elif SEGMENTS_MODE == 2:
-        # Temperature mode --> no Dots
-        segment.setDots(False)
-        asyncio.sleep_ms(500)
-        pass
+async def dots():
+    global blinkDots
+    while True:
+        if blinkDots:
+            segment.setDots(True)
+            asyncio.sleep_ms(500)
+            segment.setDots(False)
+            asyncio.sleep_ms(500)
+        else:
+            segment.setDots(False)
+            asyncio.sleep_ms(20)
+            pass
 
 
 async def main():
-    t1 = asyncio.create_task(segmentUpdate)
-    t2 = asyncio.create_task(segmentDots)
+    t1 = asyncio.create_task(setClockMode)
+    t2 = asyncio.create_task(mesureTemp)
     t3 = asyncio.create_task(updateTime)
-    await t1, t2
+    t4 = asyncio.create_task(dots)
+    t5 = asyncio.create_task(updateTime)
+    await t1, t2, t3, t4, t5
 
 asyncio.run(main())
