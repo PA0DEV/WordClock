@@ -10,16 +10,18 @@ except:
 from libs import segments
 from libs import timeSync
 import dht
-from machine import Pin
+from machine import Pin, SoftI2C
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Pin definitions # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-RTC_SDA_PIN = 0
-RTC_SCL_PIN = 5
-LED_PIN_SEGMENT = None 
-LED_PIN_WORDS = None
+RTC_SDA_PIN = 25
+RTC_SCL_PIN = 33
+LED_PIN_SEGMENT = 0 
+LED_PIN_WORDS = 0
 DHT_PIN = 0
+
+# print(SoftI2C(Pin(RTC_SCL_PIN),Pin(RTC_SDA_PIN)).scan())
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Temperature Sensor # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -56,6 +58,7 @@ async def updateTime():
         global actTime
         actTime = clock.cettime()   # update the local time
         asyncio.sleep_ms(100)
+        print(actTime)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Segments # # # # # # # # # # # # # # # # # # # # 
@@ -121,11 +124,11 @@ async def dots():
 
 
 async def main():
-    t1 = asyncio.create_task(setClockMode)
-    t2 = asyncio.create_task(mesureTemp)
-    t3 = asyncio.create_task(updateTime)
-    t4 = asyncio.create_task(dots)
-    t5 = asyncio.create_task(updateTime)
-    await t1, t2, t3, t4, t5
+    # t1 = asyncio.create_task(setClockMode)
+    # t2 = asyncio.create_task(mesureTemp)
+    t3 = asyncio.create_task(updateTime())
+    # t4 = asyncio.create_task(dots)
+    # t5 = asyncio.create_task(updateTime)
+    await t3
 
 asyncio.run(main())

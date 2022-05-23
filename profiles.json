@@ -1,0 +1,13 @@
+{
+    "profiles": [
+        {
+            "ssid": "AHL_IoT",
+            "dns": "",
+            "dhcp": true,
+            "pass": "#12345678",
+            "gateway": "",
+            "subnet": "",
+            "clientIP": ""
+        }
+    ]
+}
