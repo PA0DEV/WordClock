@@ -99,8 +99,9 @@ async def displaySegment():
 words = wordclock.WordClock(LED_PIN_WORDS)
 words.updateColor(GREEN, GREEN, GREEN, GREEN)
 async def displayWords():
-    words.updateTime(actTime[3], actTime[4])
-    await asyncio.sleep_ms(1000)
+    while True:
+        words.updateTime(actTime[3], actTime[4])
+        await asyncio.sleep_ms(1000)
 
 async def main():
     t1 = asyncio.create_task(mesureTemp())
