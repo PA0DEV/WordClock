@@ -1,1 +1,23 @@
-{"libs": ["autoUpdater.py", "ds3231.py", "ntptime.py", "segments.py", "timeSync.py", "webserver.py", "wifiManager.py", "wordclock.py"], "main": ["boot.py", "main.py", "oldmain.py", "profiles.json", "pymakr.conf", "README.md"], "settings": ["files.json", "info.json"]}
+{
+    "libs": [
+        "autoUpdater.py",
+        "ds3231.py",
+        "ntptime.py",
+        "segments.py",
+        "timeSync.py",
+        "webserver.py",
+        "wifiManager.py",
+        "wordclock.py"
+    ],
+    "main": [
+        "boot.py",
+        "main.py",
+        "profiles.json",
+        "pymakr.conf",
+        "README.md"
+    ],
+    "settings": [
+        "files.json",
+        "info.json"
+    ]
+}
