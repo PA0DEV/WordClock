@@ -12,7 +12,8 @@
 
 from libs import wifiManager, autoUpdater
 import machine
-
+import webrepl
+webrepl.start()
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Global Setup Variables  # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -44,6 +45,7 @@ updater = autoUpdater.Updater(REPO_URL)
 reqReboot = updater.downloadUpdate()
 
 if reqReboot:
+    print("rebooting...")
     # hard reset the board
     machine.reset()
 else:

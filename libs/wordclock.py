@@ -6,21 +6,21 @@ class WordClock:
     # LED addres definition
     clockWords = {
         "ES_IST": [0, 1, 2, 3, 4],
-        "minutes":{
+        "minutes":[
             [], # 0                                                                # 00
             [5, 6, 7, 8, 30, 31, 32, 33],                                          # 05
             [19, 20, 21, 22, 30, 31, 32, 33],                                      # 10
             [5, 6, 7, 8, 19, 20, 21, 22, 30, 31, 32, 33],                          # 15
             [9, 10, 11, 12, 13, 14, 15, 30, 31, 32, 33],                           # 20
             [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 30, 31, 32, 33],   # 25
-            [35, 36, 37, 38],                                                      # 30
+            [34, 35, 36, 37],                                                      # 30
             [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 38, 39, 40],       # 35
             [9, 10, 11, 12, 13, 14, 15,38, 39, 40],                                # 40
             [5, 6, 7, 8, 19, 20, 21, 22, 38, 39, 40],                              # 45
             [19, 20, 21, 22, 38, 39, 40],                                          # 50
-            [5, 6, 7, 8, 38, 39, 40],                                              # 55
-        },
-        "hours": {
+            [5, 6, 7, 8, 38, 39, 40]                                               # 55
+        ],
+        "hours": [
             [83, 84, 85, 86, 87],       # 00
             [56, 57, 58, 59],           # 01
             [49, 50, 51, 52],           # 02 
@@ -29,17 +29,17 @@ class WordClock:
             [45, 46, 47, 48],           # 05
             [72, 73, 74, 75, 76],       # 06
             [77, 78, 79, 80, 81, 82],   # 07
-            [68, 69, 70, 71]            # 08
-            [41, 42, 43, 44]            # 09
-            [95, 96, 97, 98]            # 10
+            [68, 69, 70, 71],            # 08
+            [41, 42, 43, 44],            # 09
+            [95, 96, 97, 98],            # 10
             [53, 54, 55],               # 11
             [83, 84, 85, 86, 87]        # 12
-        },
+        ],
         "MORGENS": [88, 89, 90, 91, 92, 93, 94],   # AM
         "ABENDS": [99, 100, 101, 102, 103, 104]   # PM
     }
     DEFALUT_COLOR = (0, 0, 100)
-    LED_CNT = 104
+    LED_CNT = 105
 
     prefixColor = DEFALUT_COLOR
     minuteColor = DEFALUT_COLOR
@@ -101,9 +101,6 @@ class WordClock:
         for addr in self.clockWords["minutes"][minute // 5]:
             np[addr] = self.minuteColor
 
-        # update hours
-        for addr in self.clockWords["hours"][hour]:
-            np[addr] = self.hourColor
 
         # update "MORGENS" / "ABENDS"
         if hour < 12:
@@ -112,7 +109,16 @@ class WordClock:
         elif hour >=12 :
             for addr in self.clockWords["ABENDS"]:
                 np[addr] = self.postfixColor
+            hour = hour - 12
         
+        # update hours
+        if minute < 30:
+            for addr in self.clockWords["hours"][hour]:
+                np[addr] = self.hourColor
+        else:
+            for addr in self.clockWords["hours"][hour+1]:
+                np[addr] = self.hourColor
+
         np.write()
 
     def testLEDs(self, delay, color):

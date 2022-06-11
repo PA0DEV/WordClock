@@ -4,39 +4,43 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 try:
     import asyncio
+    print("C")
 except:
     import uasyncio as asyncio
+    print("L")
 
-from libs import segments
+from libs import segments, wordclock
 from libs import timeSync
 import dht
 from machine import Pin, SoftI2C
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Pin definitions # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 RTC_SDA_PIN = 25
 RTC_SCL_PIN = 33
-LED_PIN_SEGMENT = 0 
-LED_PIN_WORDS = 0
-DHT_PIN = 0
+LED_PIN_SEGMENT = 12
+LED_PIN_WORDS = 13
+DHT_PIN = 26
 
 # print(SoftI2C(Pin(RTC_SCL_PIN),Pin(RTC_SDA_PIN)).scan())
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Temperature Sensor # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-sensor = dht.DHT11(Pin(0))
+sensor = dht.DHT11(Pin(DHT_PIN))
 Temperature = 0
 Humidity = 0
 
 async def mesureTemp():
+    global Temperature, Humidity
     while True:
-        sensor.mesure()
-        global Temperature, Humidity
+        print("T_MES")
+        sensor.measure()
         Temperature = sensor.temperature()
         Humidity = sensor.humidity()
-
-        asyncio.sleep_ms(1000)
+        print(Temperature)
+        await asyncio.sleep_ms(1000)
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -57,8 +61,9 @@ async def updateTime():
     while True:
         global actTime
         actTime = clock.cettime()   # update the local time
-        asyncio.sleep_ms(100)
+        await asyncio.sleep_ms(1000)
         print(actTime)
+        # (year, month, mday, hour, minute, second, weekday, yearday)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Initiate Segments # # # # # # # # # # # # # # # # # # # # 
@@ -67,68 +72,42 @@ async def updateTime():
 SEGMENTS_MODE = 0 # 0 = OFF, 1 = Clock, 2 = Date, 3 = Temperature, 4 = Cycle
 blinkDots = False
 
+BLUE = (0, 0, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
 
 segment = segments.Segments(LED_PIN_SEGMENT)
 
-async def setClockMode():
-    global actTime, Temperature, Humidity, blinkDots
+async def displaySegment():
     while True:
-        if SEGMENTS_MODE == 0:
-            # Turn Segments OFF
-            blinkDots = False
-            segment.setDots(False)
-            segment.setSegment(0, None)
-            segment.setSegment(1, None)
-            segment.setSegment(2, None)
-            segment.setSegment(3, None)
-            
-        elif SEGMENTS_MODE == 1:
-            # Clock Mode
-            blinkDots = True
-            segment.setDoubleSegment(0, actTime.tm_min) # Set Minutes
-            segment.setDoubleSegment(2, actTime.tm_hour) # Set Hours
-            
-        elif SEGMENTS_MODE == 2:
-            # Date mode
-            blinkDots = False
-            segment.setDots(False)
-            segment.setDoubleSegment(0, actTime.tm_mon) # Set Month
-            segment.setDoubleSegment(2, actTime.tm_mday) # Set Day
-            
-        elif SEGMENTS_MODE == 3:
-            # Temperature Mode
-            blinkDots = False
-            segment.setDots(False)
-            segment.setDoubleSegment(2, int(Temperature))
-            segment.setSegment(1, "°")
-            segment.setSegment(0, "C")
-            pass
-        elif SEGMENTS_MODE == 4:
-            # Cycle Mode
-            pass
+        print("TIME")
+        segment.setDots(True, BLUE)
+        segment.setDoubleSegment(0, actTime[4], BLUE)
+        segment.setDoubleSegment(2, actTime[3], BLUE)
+        await asyncio.sleep_ms(5000)
+        print("TEMP")
+        segment.setDots(False)
+        segment.setDoubleSegment(2, Temperature, GREEN)
+        segment.setSegment(1, "°", GREEN)
+        segment.setSegment(0, "C", GREEN)
+        await asyncio.sleep_ms(5000)
 
-        asyncio.sleep_ms(20) # Update mode every 20ms
-
-async def dots():
-    global blinkDots
-    while True:
-        if blinkDots:
-            segment.setDots(True)
-            asyncio.sleep_ms(500)
-            segment.setDots(False)
-            asyncio.sleep_ms(500)
-        else:
-            segment.setDots(False)
-            asyncio.sleep_ms(20)
-            pass
-
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Initiate Words  # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+words = wordclock.WordClock(LED_PIN_WORDS)
+words.updateColor(RED, RED, RED, RED)
+async def displayWords():
+    words.updateTime(actTime[3], actTime[4])
+    await asyncio.sleep_ms(1000)
 
 async def main():
-    # t1 = asyncio.create_task(setClockMode)
-    # t2 = asyncio.create_task(mesureTemp)
-    t3 = asyncio.create_task(updateTime())
-    # t4 = asyncio.create_task(dots)
-    # t5 = asyncio.create_task(updateTime)
-    await t3
+    t1 = asyncio.create_task(mesureTemp())
+    t2 = asyncio.create_task(updateTime())
+    t3 = asyncio.create_task(displaySegment())
+    t4 = asyncio.create_task(displayWords())
+
+    await t1, t2, t3, t4
 
 asyncio.run(main())
