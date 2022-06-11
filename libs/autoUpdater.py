@@ -27,10 +27,7 @@ class Updater:
             :return: Returns true if there is a new version available
         """
 
-        # check for available internet connection
-        if not self.isOnline():
-            print("not online")
-            return False
+        
         
         # read own fw version
         with open("./settings/info.json") as f:
@@ -49,9 +46,11 @@ class Updater:
             return False
 
     def downloadFile(self, file):
-        url = self.repoUrl + file
+        url = self.repoUrl +  file
+        print(url)
         file = requests.get(url).text
         
+
         return file
 
     def updateFile(self, file):
@@ -67,7 +66,7 @@ class Updater:
             :return: Returns True if download is ready and need to reboot
         """
         if self.isNewUpdate():
-            files = json.loads(self.downloadFile("/settings/files.json"))
+            files = json.loads(self.downloadFile("settings/files.json"))
             print("Updating")
             print()
             print("Main")
