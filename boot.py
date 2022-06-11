@@ -12,8 +12,6 @@
 
 from libs import wifiManager, autoUpdater
 import machine
-import webrepl
-webrepl.start()
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # Global Setup Variables  # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
