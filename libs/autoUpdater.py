@@ -28,11 +28,10 @@ class Updater:
             :return: Returns true if there is a new version available
         """
 
-        
-        
         # read own fw version
         with open("./settings/info.json") as f:
             ownFw = json.load(f)["device"]["version"]
+            f.close()
 
         # get available fw version
 
@@ -88,7 +87,7 @@ class Updater:
             print("settings")
             for file in files["settings"]:
                 print("[UPDATE]     " + file)
-                self.updateFile("settings" + file)
+                self.updateFile("settings/" + file)
                 ...
             
 
