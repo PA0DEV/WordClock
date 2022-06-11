@@ -1,4 +1,5 @@
 import json
+
 try:
     import requests
 except:
@@ -40,7 +41,11 @@ class Updater:
         onlineFw = json.loads(onlineFw)
         onlineFw = onlineFw["device"]["version"]
 
+        print("[UPDATE] Local Firmware: " + ownFw)
+        print("[UPDATE] Remote Firmware: " + onlineFw)
+
         if onlineFw > ownFw:
+            print("[UPDATE] Downloading Updates...")
             return True
         else:
             return False
@@ -67,22 +72,22 @@ class Updater:
         """
         if self.isNewUpdate():
             files = json.loads(self.downloadFile("settings/files.json"))
-            print("Updating")
+            print("[UPDATE] Updating")
             print()
-            print("Main")
+            print("[UPDATE] Main")
             for file in files["main"]:
                 if file != "README.md":         #< Ignore README.md
-                    print("    " + file)
+                    print("[UPDATE]     " + file)
                     self.updateFile(file)
                     ...
             print("libs:")
             for file in files["libs"]:
-                print("    " + file)
+                print("[UPDATE]     " + file)
                 self.updateFile("libs/" + file)
                 ...
             print("settings")
             for file in files["settings"]:
-                print("    " + file)
+                print("[UPDATE]     " + file)
                 self.updateFile("settings" + file)
                 ...
             
