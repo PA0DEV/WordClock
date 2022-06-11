@@ -51,7 +51,6 @@ class Updater:
 
     def downloadFile(self, file):
         url = self.repoUrl +  file
-        print(url)
         file = requests.get(url).text
         
 
@@ -79,12 +78,12 @@ class Updater:
                     print("[UPDATE]     " + file)
                     self.updateFile(file)
                     ...
-            print("libs:")
+            print("[UPDATE] libs:")
             for file in files["libs"]:
                 print("[UPDATE]     " + file)
                 self.updateFile("libs/" + file)
                 ...
-            print("settings")
+            print("[UPDATE] settings")
             for file in files["settings"]:
                 print("[UPDATE]     " + file)
                 self.updateFile("settings/" + file)
